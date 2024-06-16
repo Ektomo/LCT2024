@@ -172,7 +172,7 @@ fun ExerciseContent(
                 exercise.photos.forEach { photo ->
                     item {
                         AsyncImage(
-                            model = photo,
+                            model = photo.url.replace("8000", "5000"),
                             contentDescription = null,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -261,8 +261,8 @@ fun ExerciseContent(
             onClick = if (trainingStarted) onCompleteClick else onStartTrainingClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
                 .align(Alignment.BottomCenter)
+                .padding(16.dp)
         ) {
             Text(text = if (trainingStarted) "Выполнить упражнение" else "Начать тренировку")
         }

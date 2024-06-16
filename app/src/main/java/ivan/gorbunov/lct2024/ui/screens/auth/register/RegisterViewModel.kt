@@ -1,6 +1,9 @@
 package ivan.gorbunov.lct2024.ui.screens.auth.register
 
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import ivan.gorbunov.lct2024.LctDataStore
+import ivan.gorbunov.lct2024.gate.connection.ApiService
 import ivan.gorbunov.lct2024.ui.screens.auth.login.LoginData
 import ivan.gorbunov.lct2024.ui.screens.auth.login.Role
 import ivan.gorbunov.lct2024.ui.screens.core.BaseViewModel
@@ -12,8 +15,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class RegisterViewModel @Inject constructor(
-    // Внедрите необходимые зависимости, например, репозиторий для анкеты
+    val apiService: ApiService,
+    val dataStore: LctDataStore
 ) : BaseViewModel<Unit>(){
 
     private val _loginData = MutableStateFlow(LoginData("", ""))
@@ -32,11 +37,23 @@ class RegisterViewModel @Inject constructor(
     }
 
     fun register(onSuccess: (Role) -> Unit) {
+        setLoading()
         viewModelScope.launch(Dispatchers.IO) {
-            setLoading()
             try {
-                delay(2000)
-                onSuccess(Role.Client)
+                apiService.register(_loginData.value.name, _loginData.value.pass)
+                val user = apiService.getAboutMe()
+                dataStore.setIsLogged(true)
+                if (user.role == "client"){
+                    dataStore.setRole(Role.Client)
+                    launch(Dispatchers.Main){
+                        onSuccess(Role.Client)
+                    }
+                }else {
+                    dataStore.setRole(Role.Coach)
+                    launch(Dispatchers.Main){
+                        onSuccess(Role.Coach)
+                    }
+                }
             } catch (e: Exception) {
                 setError(e.message ?: "Unknown error")
             }

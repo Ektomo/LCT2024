@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ivan.gorbunov.lct2024.LctDataStore
+import ivan.gorbunov.lct2024.gate.connection.ApiService
 import ivan.gorbunov.lct2024.ui.screens.core.BaseViewModel
 import ivan.gorbunov.lct2024.ui.screens.core.UiState
 import kotlinx.coroutines.Dispatchers
@@ -13,8 +14,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
+@Serializable
 data class LoginData(
     val pass: String,
     val name: String
@@ -24,7 +27,7 @@ data class LoginData(
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val dataStore: LctDataStore,
-//    val gate: LctGate
+    private val apiService: ApiService
 ) : BaseViewModel<Unit>() {
 
 
@@ -44,16 +47,49 @@ class LoginViewModel @Inject constructor(
     }
 
 
-    fun login(context: Context, onSuccess: (Role) -> Unit) {
+    fun login(onSuccess: (Role) -> Unit) {
         setLoading()
         viewModelScope.launch(Dispatchers.IO) {
-
             try {
-//                delay(2000)
-                dataStore.setRole(Role.Coach)
+                apiService.login(_loginData.value.name, _loginData.value.pass)
+//                apiService.login("q@q.ru", "q")
+//                apiService.login("trainer@example.com", "password123")
+                val user = apiService.getAboutMe()
                 dataStore.setIsLogged(true)
-                launch(Dispatchers.Main){
-                    onSuccess(Role.Coach)
+                if (user.role == "client"){
+                    dataStore.setRole(Role.Client)
+                    launch(Dispatchers.Main){
+                        onSuccess(Role.Client)
+                    }
+                }else {
+                    dataStore.setRole(Role.Coach)
+                    launch(Dispatchers.Main){
+                        onSuccess(Role.Coach)
+                    }
+                }
+            } catch (e: Exception) {
+                setError(e.message ?: "Unknown error")
+            }
+        }
+    }
+
+    fun register(onSuccess: (Role) -> Unit) {
+        setLoading()
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                apiService.register(_loginData.value.name, _loginData.value.pass)
+                val user = apiService.getAboutMe()
+                dataStore.setIsLogged(true)
+                if (user.role == "client"){
+                    dataStore.setRole(Role.Client)
+                    launch(Dispatchers.Main){
+                        onSuccess(Role.Client)
+                    }
+                }else {
+                    dataStore.setRole(Role.Coach)
+                    launch(Dispatchers.Main){
+                        onSuccess(Role.Coach)
+                    }
                 }
             } catch (e: Exception) {
                 setError(e.message ?: "Unknown error")

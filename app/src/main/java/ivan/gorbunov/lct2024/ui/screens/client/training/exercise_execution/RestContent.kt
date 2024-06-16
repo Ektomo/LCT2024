@@ -196,6 +196,9 @@ fun RestScreen(
     }
 }
 
-enum class WorkoutState {
-    Distance, Weight, Duration, Self
+enum class WorkoutState(val displayName: String) {
+    Distance("Упражнение на дистанцию"),
+    Weight("Силовое упражнение"),
+    Duration("Упражнение на время"),
+    Self("Упражнение без отягощений")
 }

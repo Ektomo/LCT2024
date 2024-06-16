@@ -2,6 +2,7 @@ package ivan.gorbunov.lct2024.ui.screens.core
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ivan.gorbunov.lct2024.ui.screens.graph.UiSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,7 +11,12 @@ import kotlinx.coroutines.launch
 abstract class BaseViewModel<T> : ViewModel() {
     private val _uiState = MutableStateFlow<UiState<T>>(UiState.Loading)
     val uiState: StateFlow<UiState<T>> = _uiState
+    private val _uiSettings = MutableStateFlow(UiSettings())
+    val uiSettings: StateFlow<UiSettings> = _uiSettings
 
+    fun setUiSettings(uiSettings: UiSettings){
+        _uiSettings.value = uiSettings
+    }
     protected fun setLoading() {
         _uiState.value = UiState.Loading
     }

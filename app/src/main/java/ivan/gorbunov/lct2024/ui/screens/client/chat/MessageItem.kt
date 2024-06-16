@@ -17,16 +17,17 @@ import androidx.compose.ui.unit.dp
 import ivan.gorbunov.lct2024.gate.data.ChatMessage
 
 @Composable
-fun MessageItem(message: ChatMessage) {
-    val backgroundColor = if (message.isUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-    val textColor = if (message.isUser) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-    val alignment = if (message.isUser) Alignment.End else Alignment.Start
+fun MessageItem(message: ChatMessage, senderId: Int) {
+    val isUser = message.senderId == senderId
+    val backgroundColor = if (isUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+    val textColor = if (isUser) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+    val alignment = if (isUser) Alignment.End else Alignment.Start
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        horizontalArrangement = if (message.isUser) Arrangement.End else Arrangement.Start
+        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
     ) {
         Surface(
             shape = RoundedCornerShape(8.dp),
@@ -34,7 +35,7 @@ fun MessageItem(message: ChatMessage) {
             modifier = Modifier.widthIn(max = 250.dp)
         ) {
             Text(
-                text = message.text,
+                text = message.message,
                 color = textColor,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(8.dp)

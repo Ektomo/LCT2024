@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import ivan.gorbunov.lct2024.ui.screens.auth.login.LoginData
+import ivan.gorbunov.lct2024.ui.screens.auth.login.Role
 import ivan.gorbunov.lct2024.ui.screens.core.CrossfadeState
 import ivan.gorbunov.lct2024.ui.screens.core.DefaultErrorContent
 import ivan.gorbunov.lct2024.ui.screens.core.DefaultLoadingContent
@@ -50,7 +51,17 @@ fun RegisterView(navController: NavHostController, viewModel: RegisterViewModel)
                 onEmailChange = { viewModel.updateEmail(it) },
                 onPasswordChange = { viewModel.updatePassword(it) },
                 onRegister = { viewModel.register{
-
+                    if (it == Role.Client) {
+                        navController.navigate("client") {
+                            popUpTo("login") { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }else{
+                        navController.navigate("coach") {
+                            popUpTo("login") { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
                 }},
                 onLogin = { navController.navigate("login"){
                     launchSingleTop = true

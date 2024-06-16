@@ -1,7 +1,9 @@
 package ivan.gorbunov.lct2024.gate.data
 
+import ivan.gorbunov.lct2024.ui.screens.client.progress.ChipParameter
+
 data class ChartData(val date: String, val value: Float)
-data class Parameter(val name: String)
+data class Parameter(override val name: String): ChipParameter
 data class Quote(val text: String)
 data class Comment(val text: String, val author: String)
 

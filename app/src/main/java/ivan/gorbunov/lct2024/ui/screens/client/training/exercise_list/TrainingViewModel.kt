@@ -160,7 +160,7 @@ class TrainingViewModel(
         }
     }
 
-    fun goToExerciseWith(id: String) {
+    fun goToExerciseWith(id: Int) {
         val exercise = training?.exercises?.find { it.id == id }
         if (exercise != null) {
             curExercise = exercise

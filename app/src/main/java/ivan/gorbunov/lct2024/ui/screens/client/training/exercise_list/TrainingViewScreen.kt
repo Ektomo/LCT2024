@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -90,6 +91,7 @@ fun TrainingView(
         errorContent = { message -> DefaultErrorContent(message) },
         trainingContent = { training ->
             TrainingOverview(
+                uiSettings,
                 training,
                 onBottomClick = {
                     vm.setWarmUp()
@@ -207,12 +209,16 @@ fun TrainingView(
 
 @Composable
 fun TrainingOverview(
+    uiSettings: MutableState<UiSettings>,
     training: Training,
     onBottomClick: () -> Unit,
-    onExerciseClick: (String) -> Unit,
+    onExerciseClick: (Int) -> Unit,
     isEnabled: Boolean = true,
     isCoach: Boolean = false
 ) {
+    LaunchedEffect(key1 = Unit) {
+        uiSettings.value = UiSettings()
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -241,7 +247,7 @@ fun TrainingOverview(
 }
 
 @Composable
-fun ExerciseList(modifier: Modifier, exercises: List<Exercise>, isEnabled: Boolean = true, onExerciseClick: (String) -> Unit) {
+fun ExerciseList(modifier: Modifier, exercises: List<Exercise>, isEnabled: Boolean = true, onExerciseClick: (Int) -> Unit) {
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         exercises.forEachIndexed { _, exercise ->
             ExerciseItem(exercise = exercise, isEnabled = isEnabled, onClick = { onExerciseClick(exercise.id) })
@@ -257,7 +263,7 @@ fun ExerciseItem(exercise: Exercise, isEnabled: Boolean = true, onClick: () -> U
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .also {
-                if (isEnabled){
+                if (isEnabled) {
                     it.clickable(onClick = onClick)
                 }
             },

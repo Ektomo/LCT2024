@@ -60,7 +60,7 @@ fun LoginScreen(
                 onEmailChange = { vm.updateEmail(it) },
                 onPasswordChange = { vm.updatePassword(it) },
                 onLogin = {
-                    vm.login(context) {
+                    vm.login {
                         if (it == Role.Client) {
                             navController.navigate("client") {
                                 popUpTo("login") { inclusive = true }

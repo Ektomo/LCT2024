@@ -8,17 +8,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ivan.gorbunov.lct2024.gate.data.Parameter
 
+interface ChipParameter{
+    val name: String
+}
+
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun ParameterChips(parameters: List<Parameter>, selectedParameter: Parameter, onParameterSelected: (Parameter) -> Unit) {
+fun <T: ChipParameter> FilterChips(parameters: List<T>, selectedParameter: T, onParameterSelected: (T) -> Unit) {
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
     ) {
