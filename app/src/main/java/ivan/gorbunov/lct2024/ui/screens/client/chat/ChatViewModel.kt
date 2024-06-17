@@ -59,12 +59,12 @@ class ChatViewModel @Inject constructor(
         setLoading()
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                val receivers = if (type == Role.Coach) service.getTrainers() else service.getClients()
+                val receivers = if (type == Role.Coach) service.getClients() else service.getTrainers()
                 _receivers.value = receivers
                 _selectedCoach.value = _receivers.value.firstOrNull()
                 val history = service.getChatHistory( _selectedCoach.value!!.id, page, size)
                 page++
-                _chatHistory.value = history.messages
+                _chatHistory.value = history.reversed()
                 connectToChat(service.getUser().id)
                 setSuccess(Unit)
             }catch (e: Exception){
@@ -77,10 +77,11 @@ class ChatViewModel @Inject constructor(
         setLoading()
         viewModelScope.launch(Dispatchers.IO) {
             try{
+                page = 1
                 _selectedCoach.value = coach
                 val history = service.getChatHistory(_selectedCoach.value!!.id, page, size)
                 page++
-                _chatHistory.value = history.messages
+                _chatHistory.value = history.reversed()
                 connectToChat(service.getUser().id)
                 setSuccess(Unit)
             }catch (e: Exception){
@@ -96,7 +97,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val history = service.getChatHistory(_selectedCoach.value!!.id, page, 50)
-                _chatHistory.value += history.messages
+                _chatHistory.value += history.reversed()
                 page++
                 setSuccess(Unit)
             } catch (e: Exception) {

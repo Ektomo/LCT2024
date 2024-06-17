@@ -52,7 +52,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 apiService.login(_loginData.value.name, _loginData.value.pass)
-//                apiService.login("q@q.ru", "q")
+//                apiService.login("client@example.com", "password123")
 //                apiService.login("trainer@example.com", "password123")
                 val user = apiService.getAboutMe()
                 dataStore.setIsLogged(true)

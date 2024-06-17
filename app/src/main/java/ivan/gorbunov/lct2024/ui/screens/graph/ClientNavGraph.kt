@@ -102,7 +102,7 @@ data class UiBottomBar(
 @Composable
 fun UserBottomNavigation(navController: NavController) {
     val items = listOf(
-        ClientBottomMenuItem.Home,
+//        ClientBottomMenuItem.Home,
         ClientBottomMenuItem.Workouts,
         ClientBottomMenuItem.Chat,
         ClientBottomMenuItem.Progress

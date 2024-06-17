@@ -49,7 +49,7 @@ fun ClientItem(client: User, onMenuItemClick: (DropdownClientChoose, User) -> Un
         Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(
                 model =
-//                (client.url?.ifEmpty {  } ?:
+                client.avatar_path ?:
                 "http://176.123.166.61:5000/media/exercise/image/9287449b4d791d6e30459979206bde33.jpeg",
                 contentDescription = null,
                 modifier = Modifier

@@ -1,6 +1,7 @@
 package ivan.gorbunov.lct2024.gate.connection
 
 import ivan.gorbunov.lct2024.gate.data.ChatHistory
+import ivan.gorbunov.lct2024.gate.data.ChatMessage
 import ivan.gorbunov.lct2024.gate.data.Exercise
 import ivan.gorbunov.lct2024.gate.data.ExerciseListResponse
 import ivan.gorbunov.lct2024.gate.data.LoginRequest
@@ -48,13 +49,13 @@ class ApiService @Inject constructor(private val gate: Gate) {
         return format.decodeFromString<TrainersResponse>(response).result
     }
 
-    fun getChatHistory(receiverId: Int, page: Int, size: Int): ChatHistory {
+    fun getChatHistory(receiverId: Int, page: Int, size: Int): List<ChatMessage> {
         val response = gate.makeSyncRequest<Unit>(
             "chats/history?receiver_id=$receiverId&page=$page&size=$size",
             null,
             HttpMethod.GET
         )
-        return format.decodeFromString(response)
+        return format.decodeFromString<ChatHistory>(response).messages.map { ChatMessage(it.content, it.senderId, it.receiverId, it.filePath) }
     }
 
     fun getUser() = gate.user!!
