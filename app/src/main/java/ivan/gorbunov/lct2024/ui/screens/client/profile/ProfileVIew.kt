@@ -1,5 +1,6 @@
 package ivan.gorbunov.lct2024.ui.screens.client.profile
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -39,10 +40,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,11 +53,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import ivan.gorbunov.lct2024.R
 import ivan.gorbunov.lct2024.gate.data.User
@@ -63,7 +69,9 @@ import ivan.gorbunov.lct2024.ui.screens.core.CrossfadeState
 import ivan.gorbunov.lct2024.ui.screens.core.DefaultErrorContent
 import ivan.gorbunov.lct2024.ui.screens.core.DefaultLoadingContent
 import ivan.gorbunov.lct2024.ui.screens.graph.UiSettings
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun ProfileView(
@@ -108,6 +116,14 @@ fun ProfileItemContent(user: User) {
         mutableStateOf(false)
     }
 
+    var showShareDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var curTitul by remember {
+        mutableStateOf(titules.first())
+    }
+
     val coroutineScope = rememberCoroutineScope()
 
     val bottomSheetState =
@@ -121,6 +137,19 @@ fun ProfileItemContent(user: User) {
         }
     }
 
+    var curPerson by remember {
+        mutableFloatStateOf(1f)
+    }
+
+    var curRes by remember {
+        mutableIntStateOf(R.drawable.person1)
+    }
+
+    if (showShareDialog){
+        ShareProfileScreen(name = user.name ?: "Имя", surname = user.surname ?: "Фамилия", title = curTitul, imageRes = curRes) {
+            showShareDialog = false
+        }
+    }
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
         sheetContainerColor = MaterialTheme.colorScheme.surface,
@@ -204,6 +233,39 @@ fun ProfileItemContent(user: User) {
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        shadowElevation = 2.dp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)
+                        )
+//                            .background(color = NavigationBarDefaults.containerColor)
+//        border = BorderStroke(width = 1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(4.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ticket),
+                                contentDescription = "Phest",
+                                modifier = Modifier
+                                    .size(100.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column {
+                                Text("Билет на фестиваль на пароме - 1100 монет", fontSize = 16.sp)
+                                Button(onClick = { /* Purchase */ }) {
+                                    Text("Купить")
+                                }
+                            }
+                        }
+                    }
                 } else {
                     Text(
                         text = "История событий",
@@ -266,7 +328,7 @@ fun ProfileItemContent(user: User) {
                     ) {
                         Column(modifier = Modifier.padding(8.dp)) {
                             Text(text = "Анти достижение", fontSize = 16.sp)
-                            Text("Пропустил 3 тренировки подряд", fontSize = 14.sp)
+                            Text("Пропустил 10 тренировок подряд", fontSize = 14.sp)
                             Text("Дата: 14.02.2024", fontSize = 14.sp)
                             Button(onClick = {
                                 showAlert = true
@@ -302,7 +364,9 @@ fun ProfileItemContent(user: User) {
                     fontWeight = FontWeight.Bold
                 )
 
-                DropdownTitules()
+                DropdownTitules(curTitul){
+                    curTitul = it
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -332,65 +396,82 @@ fun ProfileItemContent(user: User) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    var curPerson by remember {
-                        mutableFloatStateOf(1f)
+                    LaunchedEffect(curPerson) {
+                        curRes = when(curPerson){
+                            1f ->  R.drawable.person1
+                            2f ->  R.drawable.person2
+                            3f ->  R.drawable.person3
+                            4f ->  R.drawable.person4
+                            5f ->  R.drawable.person5
+                            6f ->  R.drawable.person6
+                            else ->  R.drawable.person1
+                        }
                     }
 
-                    when {
-                        curPerson >= 1f && curPerson < 2f -> Image(
-                            painterResource(
-                                id =
-                                R.drawable.person1
-                            ),
-                            modifier = Modifier.height(300.dp),
-                            contentDescription = "",
-                        )
 
-                        curPerson >= 2f && curPerson < 3f -> Image(
-                            painterResource(
-                                id =
-                                R.drawable.person2
-                            ),
-                            modifier = Modifier.height(300.dp),
-                            contentDescription = "",
-                        )
+                    Image(
+                        painterResource(
+                            id = curRes
+                        ),
+                        modifier = Modifier.height(300.dp),
+                        contentDescription = "",
+                    )
 
-                        curPerson >= 3f && curPerson < 4f -> Image(
-                            painterResource(
-                                id =
-                                R.drawable.person3
-                            ),
-                            modifier = Modifier.height(300.dp),
-                            contentDescription = "",
-                        )
-
-                        curPerson >= 4f && curPerson < 5f -> Image(
-                            painterResource(
-                                id =
-                                R.drawable.person4
-                            ),
-                            modifier = Modifier.height(300.dp),
-                            contentDescription = "",
-                        )
-
-                        curPerson >= 5f && curPerson < 6f -> Image(
-                            painterResource(
-                                id =
-                                R.drawable.person5
-                            ),
-                            modifier = Modifier.height(300.dp),
-                            contentDescription = "",
-                        )
-
-                        curPerson >= 6f -> Image(
-                            painterResource(
-                                id =
-                                R.drawable.person6
-                            ),
-                            modifier = Modifier.height(300.dp),
-                            contentDescription = "",
-                        )
-                    }
+//                    when {
+//                        curPerson >= 1f && curPerson < 2f -> Image(
+//                            painterResource(
+//                                id =
+//                                R.drawable.person1
+//                            ),
+//                            modifier = Modifier.height(300.dp),
+//                            contentDescription = "",
+//                        )
+//
+//                        curPerson >= 2f && curPerson < 3f -> Image(
+//                            painterResource(
+//                                id =
+//                                R.drawable.person2
+//                            ),
+//                            modifier = Modifier.height(300.dp),
+//                            contentDescription = "",
+//                        )
+//
+//                        curPerson >= 3f && curPerson < 4f -> Image(
+//                            painterResource(
+//                                id =
+//                                R.drawable.person3
+//                            ),
+//                            modifier = Modifier.height(300.dp),
+//                            contentDescription = "",
+//                        )
+//
+//                        curPerson >= 4f && curPerson < 5f -> Image(
+//                            painterResource(
+//                                id =
+//                                R.drawable.person4
+//                            ),
+//                            modifier = Modifier.height(300.dp),
+//                            contentDescription = "",
+//                        )
+//
+//                        curPerson >= 5f && curPerson < 6f -> Image(
+//                            painterResource(
+//                                id =
+//                                R.drawable.person5
+//                            ),
+//                            modifier = Modifier.height(300.dp),
+//                            contentDescription = "",
+//                        )
+//
+//                        curPerson >= 6f -> Image(
+//                            painterResource(
+//                                id =
+//                                R.drawable.person6
+//                            ),
+//                            modifier = Modifier.height(300.dp),
+//                            contentDescription = "",
+//                        )
+//                    }
 
 
                     Slider(value = curPerson, onValueChange = {
@@ -429,6 +510,15 @@ fun ProfileItemContent(user: User) {
                 Text("История достижений", fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
 
+            Spacer(modifier = Modifier.height(32.dp))
+
+
+            Button(onClick = { showShareDialog = true }, modifier = Modifier.fillMaxWidth()) {
+                Text(text = "Поделиться", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+
+
+
 
         }
     }
@@ -448,10 +538,10 @@ fun ProfileItemContent(user: User) {
 }
 
 @Composable
-fun DropdownTitules() {
-    var curTitul by remember {
-        mutableStateOf(titules.first())
-    }
+fun DropdownTitules(curTitul: String, onSelect: (String) -> Unit) {
+//    var curTitul by remember {
+//        mutableStateOf(titules.first())
+//    }
 
     var expanded by remember {
         mutableStateOf(false)
@@ -469,7 +559,7 @@ fun DropdownTitules() {
             titules.forEach { name ->
                 DropdownMenuItem(
                     onClick = {
-                        curTitul = name
+                        onSelect(name)
                         expanded = false
                     },
                     text = {
