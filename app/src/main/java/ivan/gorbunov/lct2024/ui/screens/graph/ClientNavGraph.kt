@@ -24,6 +24,8 @@ import ivan.gorbunov.lct2024.ui.screens.client.chat.ChatView
 import ivan.gorbunov.lct2024.ui.screens.client.chat.ChatViewModel
 import ivan.gorbunov.lct2024.ui.screens.client.home.HomeView
 import ivan.gorbunov.lct2024.ui.screens.client.home.HomeViewModel
+import ivan.gorbunov.lct2024.ui.screens.client.profile.ProfileView
+import ivan.gorbunov.lct2024.ui.screens.client.profile.ProfileViewModel
 import ivan.gorbunov.lct2024.ui.screens.client.progress.ProgressView
 import ivan.gorbunov.lct2024.ui.screens.client.progress.ProgressViewModel
 import ivan.gorbunov.lct2024.ui.screens.client.training.exercise_list.TrainingView
@@ -65,6 +67,15 @@ fun NavGraphBuilder.clientNavGraph(
         val vm = hiltViewModel<TrainingViewModel>()
         TrainingView(vm = vm, pv = paddingValues, uiSettings, navController)
     }
+    composable(ClientBottomMenuItem.Profile.screen_route){
+        val vm = hiltViewModel<ProfileViewModel>()
+        ProfileView(
+            navController = navController,
+            vm = vm,
+            pv = paddingValues,
+            uiSettings = uiSettings
+        )
+    }
 
 }
 
@@ -81,6 +92,9 @@ sealed class ClientBottomMenuItem(var title: String, var icon: Int, var screen_r
 
     object Progress :
         ClientBottomMenuItem("Прогресс", R.drawable.baseline_timeline_24, "progress")
+
+    object Profile:
+            ClientBottomMenuItem("Профиль", R.drawable.baseline_home_24, "profile")
 }
 
 sealed class ClientNavItem(val screen_route: String) {
@@ -105,7 +119,8 @@ fun UserBottomNavigation(navController: NavController) {
 //        ClientBottomMenuItem.Home,
         ClientBottomMenuItem.Workouts,
         ClientBottomMenuItem.Chat,
-        ClientBottomMenuItem.Progress
+        ClientBottomMenuItem.Progress,
+        ClientBottomMenuItem.Profile
     )
 
 

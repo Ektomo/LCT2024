@@ -1,13 +1,16 @@
 package ivan.gorbunov.lct2024.ui.screens.auth.login
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,26 +21,24 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import ivan.gorbunov.lct2024.R
 import ivan.gorbunov.lct2024.ui.screens.core.CrossfadeState
 import ivan.gorbunov.lct2024.ui.screens.core.DefaultErrorContent
 import ivan.gorbunov.lct2024.ui.screens.core.DefaultLoadingContent
+import ivan.gorbunov.lct2024.ui.screens.core.UiState
 
 @Composable
 fun LoginScreen(
@@ -66,7 +67,7 @@ fun LoginScreen(
                                 popUpTo("login") { inclusive = true }
                                 launchSingleTop = true
                             }
-                        }else{
+                        } else {
                             navController.navigate("coach") {
                                 popUpTo("login") { inclusive = true }
                                 launchSingleTop = true
@@ -79,7 +80,14 @@ fun LoginScreen(
                         launchSingleTop = true
                     }
                 })
+        },
+        onBack =
+        if (uiState is UiState.Success) {
+            null
+        } else {
+            { vm.setInit() }
         }
+
     )
 }
 
