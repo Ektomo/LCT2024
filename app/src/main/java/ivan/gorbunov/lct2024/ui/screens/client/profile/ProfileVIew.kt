@@ -266,6 +266,70 @@ fun ProfileItemContent(user: User) {
                             }
                         }
                     }
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        shadowElevation = 2.dp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)
+                        )
+//                            .background(color = NavigationBarDefaults.containerColor)
+//        border = BorderStroke(width = 1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(4.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.consult),
+                                contentDescription = "cons",
+                                modifier = Modifier
+                                    .size(100.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column {
+                                Text("Бесплатная консультация - 800 монет", fontSize = 16.sp)
+                                Button(onClick = { /* Purchase */ }) {
+                                    Text("Купить")
+                                }
+                            }
+                        }
+                    }
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        shadowElevation = 2.dp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)
+                        )
+//                            .background(color = NavigationBarDefaults.containerColor)
+//        border = BorderStroke(width = 1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(4.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.free),
+                                contentDescription = "Phest",
+                                modifier = Modifier
+                                    .size(100.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column {
+                                Text("Бесплатная тренировка - 2000 монет", fontSize = 16.sp)
+                                Button(onClick = { /* Purchase */ }) {
+                                    Text("Купить")
+                                }
+                            }
+                        }
+                    }
                 } else {
                     Text(
                         text = "История событий",
