@@ -3,7 +3,8 @@ package ivan.gorbunov.lct2024.ui.screens.client.home
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ivan.gorbunov.lct2024.gate.data.HomeCategories
 import ivan.gorbunov.lct2024.gate.data.HomeItem
-import ivan.gorbunov.lct2024.gate.data.mockGateNews
+import ivan.gorbunov.lct2024.gate.data.homeItems
+
 import ivan.gorbunov.lct2024.ui.screens.core.BaseViewModel
 import javax.inject.Inject
 
@@ -14,7 +15,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         setLoading()
-        setSuccessList(mockGateNews)
+        setSuccessList(homeItems)
     }
 
     fun goToCard(item: HomeItem){

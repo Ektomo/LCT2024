@@ -1,5 +1,6 @@
 package ivan.gorbunov.lct2024.ui.screens.client.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -19,8 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,32 +38,39 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import ivan.gorbunov.lct2024.gate.data.HomeCategories
 import ivan.gorbunov.lct2024.gate.data.HomeItem
 import ivan.gorbunov.lct2024.ui.screens.core.CrossfadeState
 import ivan.gorbunov.lct2024.ui.screens.core.DefaultErrorContent
 import ivan.gorbunov.lct2024.ui.screens.core.DefaultLoadingContent
 import ivan.gorbunov.lct2024.ui.screens.graph.UiSettings
-import org.jetbrains.annotations.Async
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeView(navController: NavHostController, vm: HomeViewModel, pv: PaddingValues, uiSettings: MutableState<UiSettings>){
+fun HomeView(
+    navController: NavHostController,
+    vm: HomeViewModel,
+    pv: PaddingValues,
+    uiSettings: MutableState<UiSettings>
+) {
 
     val uiState by vm.uiState.collectAsState()
     uiSettings.value = UiSettings()
 
     var selectedItem by remember { mutableStateOf<HomeItem?>(null) }
-
+    var scope = rememberCoroutineScope()
 
 
     CrossfadeState(
@@ -70,18 +78,114 @@ fun HomeView(navController: NavHostController, vm: HomeViewModel, pv: PaddingVal
         loadingContent = { DefaultLoadingContent() },
         errorContent = { message -> DefaultErrorContent(message) },
         successListContent = { list ->
-            HomeContent(homeData = list, pv) {
-                selectedItem = it
+            val bottomSheetState = rememberStandardBottomSheetState(
+                initialValue = SheetValue.Hidden,
+                skipHiddenState = false
+            )
+            val bottomSheetScaffoldState =
+                rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState)
+
+            BottomSheetScaffold(
+                scaffoldState = bottomSheetScaffoldState,
+                sheetContent = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.8f)
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.End
+//                        ) {
+//                            IconButton(onClick = {
+//                                scope.launch {
+//                                    bottomSheetState.hide()
+//                                }
+//                            }) {
+//                                Icon(
+//                                    imageVector = Icons.Default.Close,
+//                                    contentDescription = "Close"
+//                                )
+//                            }
+//                        }
+
+                        selectedItem?.img?.let {
+                            Image(
+                                painterResource(id = it),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.FillHeight
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = selectedItem?.title ?: "Наименование",
+                            style = MaterialTheme.typography.headlineSmall,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+//                        selectedItem?.data?.get("date")?.let {
+//                            Text(
+//                                text = it,
+//                                style = MaterialTheme.typography.bodySmall,
+//                                color = Color.Gray,
+//                                textAlign = TextAlign.Center,
+//                                modifier = Modifier.fillMaxWidth()
+//                            )
+//                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        selectedItem?.description?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+
+                        if (selectedItem?.cat == HomeCategories.Coaches) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(onClick = {  }, modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = "Выбрать",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }else if (selectedItem?.cat == HomeCategories.Receipts){
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(onClick = {  }, modifier = Modifier.fillMaxWidth()) {
+
+                                Text(
+                                    text = "Поделиться",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                },
+                sheetPeekHeight = 0.dp
+            ) {
+                HomeContent(homeData = list, pv) {
+                    selectedItem = it
+                    scope.launch {
+                        bottomSheetState.expand()
+                    }
+                }
             }
         }
     )
-
-    if (selectedItem != null) {
-        DetailBottomSheet(
-            item = selectedItem!!,
-            onDismiss = { selectedItem = null }
-        )
-    }
 
 }
 
@@ -93,7 +197,6 @@ fun HomeContent(
 ) {
 
     val scrollState = rememberScrollState()
-
 
 
     val newsItems = homeData.filter { it.cat == HomeCategories.News }
@@ -131,7 +234,7 @@ fun HomeContent(
 
 
         Text(
-            text = "Наши тренера",
+            text = "Наши тренеры",
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -192,15 +295,17 @@ fun ItemCard(item: HomeItem, onItemClick: (HomeItem) -> Unit) {
     Surface(
         shape = RoundedCornerShape(8.dp),
         shadowElevation = 2.dp,
-        modifier = Modifier.padding(bottom = 8.dp).background(color = NavigationBarDefaults.containerColor)
+        modifier = Modifier
+            .padding(bottom = 8.dp)
+            .background(color = NavigationBarDefaults.containerColor)
 //        border = BorderStroke(width = 1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)),
     ) {
         Column(modifier = Modifier
             .width(300.dp)
             .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
             .clickable { onItemClick(item) }) {
-            AsyncImage(
-                model = item.img,
+            Image(
+                painterResource(id = item.img!!),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -209,91 +314,25 @@ fun ItemCard(item: HomeItem, onItemClick: (HomeItem) -> Unit) {
             )
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(
-                    text = item.data["title"] ?: "",
+                    text = item.title ?: "",
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(top = 8.dp)
                 )
-                item.data["description"]?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+//                item.data["description"]?.let {
+//                    Text(
+//                        text = it,
+//                        style = MaterialTheme.typography.bodyMedium
+//                    )
+//                }
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DetailBottomSheet(item: HomeItem, onDismiss: () -> Unit) {
-    val bottomSheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded)
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState)
-
-    BottomSheetScaffold(
-        scaffoldState = bottomSheetScaffoldState,
-        sheetContent = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.8f)
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    IconButton(onClick = onDismiss) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
-                    }
-                }
-
-                item.img?.let {
-                    AsyncImage(
-                        model = it,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = item.data["title"] ?: "Наименование",
-                    style = MaterialTheme.typography.headlineSmall,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                item.data["date"]?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-                item.data["description"]?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-        },
-        sheetPeekHeight = 0.dp
-    ) {
-        // Empty content for the main scaffold, as the bottom sheet will cover the screen
-    }
-}
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun DetailBottomSheet(item: HomeItem, onDismiss: () -> Unit) {
+//
+//    // Empty content for the main scaffold, as the bottom sheet will cover the screen
+//}
+//}

@@ -34,7 +34,7 @@ fun MainNavGraph(
             val vm = hiltViewModel<RegisterViewModel>()
             RegisterView(navController = navController, vm)
         }
-        navigation(ClientBottomMenuItem.Workouts.screen_route, "client") {
+        navigation(ClientBottomMenuItem.Home.screen_route, "client") {
 
             clientNavGraph(navController, paddingValues, uiSettings, bottomBar)
 

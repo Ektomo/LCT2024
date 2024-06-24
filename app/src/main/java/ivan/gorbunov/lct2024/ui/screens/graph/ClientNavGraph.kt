@@ -42,15 +42,15 @@ fun NavGraphBuilder.clientNavGraph(
     bottomBar: MutableState<UiBottomBar>
 ) {
 
-//    composable(ClientBottomMenuItem.Home.screen_route) {
-//        val vm = hiltViewModel<HomeViewModel>()
-//
-//        HomeView(navController = navController, vm, paddingValues, uiSettings)
-//    }
-    composable(ClientBottomMenuItem.Workouts.screen_route) {
+    composable(ClientBottomMenuItem.Home.screen_route) {
+        val vm = hiltViewModel<HomeViewModel>()
         bottomBar.value = UiBottomBar(bottomBar = {
             UserBottomNavigation(navController = navController)
         })
+        HomeView(navController = navController, vm, paddingValues, uiSettings)
+    }
+    composable(ClientBottomMenuItem.Workouts.screen_route) {
+
         val vm = hiltViewModel<WorkoutViewModel>()
         WorkoutView(navController = navController, vm, paddingValues, uiSettings)
     }
@@ -82,7 +82,7 @@ fun NavGraphBuilder.clientNavGraph(
 sealed class ClientBottomMenuItem(var title: String, var icon: Int, var screen_route: String) {
 
     object Home :
-        ClientBottomMenuItem("Дом", R.drawable.baseline_home_24, "home")
+        ClientBottomMenuItem("Главная", R.drawable.baseline_newspaper_24, "home")
 
     object Workouts :
         ClientBottomMenuItem("Тренировки", R.drawable.baseline_work_24, "workouts_client")
@@ -116,7 +116,7 @@ data class UiBottomBar(
 @Composable
 fun UserBottomNavigation(navController: NavController) {
     val items = listOf(
-//        ClientBottomMenuItem.Home,
+        ClientBottomMenuItem.Home,
         ClientBottomMenuItem.Workouts,
         ClientBottomMenuItem.Chat,
         ClientBottomMenuItem.Progress,
